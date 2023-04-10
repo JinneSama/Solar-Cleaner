@@ -1,0 +1,41 @@
+body{
+    background: #000;
+}
+
+.main-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-container h1,h3{
+    color: #3da5e2;
+}
+
+.w-outer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    width: 11rem;
+    height: 11rem;
+    border-radius: 50%;
+    
+    border-style: solid;
+    border-color:#0011ff;
+}
+
+.w-inner{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #3da5e2;
+    width: 10.5rem;
+    height: 10.5rem;
+    border-radius: 50%;
+}
+
+.w-inner p{
+    font-size: 1.2em;
+}
