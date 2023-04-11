@@ -13,7 +13,16 @@ body{
     color: #3da5e2;
 }
 
+.container-mask{
+    position: absolute;
+    top: 0;
+    background: #000;
+    width: 11rem;
+    height: 5rem;
+}
+
 .w-outer{
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -24,8 +33,22 @@ body{
     
     border-style: solid;
     border-color:#0011ff;
+    overflow: hidden;
 }
 
+.w-outer::after{
+    content: "";
+    display: block;
+    position: absolute;
+    width: 15rem;
+    height: 15rem;
+    background: #000000;
+    border-radius: 40%;
+    left: 50%;
+    top: -15rem;
+    transform: translateX(-50%);
+    animation: fill 4s ease-in-out;
+}
 .w-inner{
     display: flex;
     align-items: center;
@@ -36,6 +59,19 @@ body{
     border-radius: 50%;
 }
 
-.w-inner p{
+.main-container p{
     font-size: 1.2em;
+    color: #0011ff;
+}
+
+
+@keyframes fill{
+    from{
+        top: 0;
+        transform: translateX(-50%) rotate(0deg);
+    }
+    to{
+        top: -15rem;
+        transform: translateX(-50%) rotate(360deg);
+    }
 }
