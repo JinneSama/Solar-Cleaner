@@ -6,22 +6,18 @@
 #define Y_L_EN 12
 #define Y_R_EN 13
 
-#define Pump_Relay 6
 #define X_Limit 4
 #define Y_Limit 5
 
-void setup() {
-  Serial.begin(9600);
+void initMotor() {
   pinMode(X_Motor, OUTPUT);
   pinMode(Y_Motor, OUTPUT);
   pinMode(X_L_EN,OUTPUT);
   pinMode(X_R_EN,OUTPUT);
   pinMode(Y_R_EN,OUTPUT);
   pinMode(Y_L_EN,OUTPUT);
-  pinMode(Pump_Relay,OUTPUT);
   pinMode(X_Limit,INPUT_PULLUP);
   pinMode(Y_Limit,INPUT_PULLUP);
-  digitalWrite(Pump_Relay , HIGH);
 
   //8Khz Frequency on Pin 11 and 12
   TCCR1A = (1 << WGM10) | (1 << COM1A1) | (1 << COM1B1);
@@ -32,33 +28,6 @@ void setup() {
   TCCR1B |= (1 << CS10);
 }
 
-void loop() {
-  if (Serial.available()) {
-    String receivedString = Serial.readStringUntil('\n');
-    if (receivedString.startsWith("X_CCW")) {
-      X_Motor_CCW(separateValue(receivedString));
-    } else if (receivedString.startsWith("X_CW")) {
-      X_Motor_CW(separateValue(receivedString));
-    } else if (receivedString.startsWith("Y_CCW")) {
-      Y_Motor_CCW(separateValue(receivedString));
-    } else if (receivedString.startsWith("Y_CW")) {
-      Y_Motor_CW(separateValue(receivedString));
-    } else if (receivedString.startsWith("X_STOP")) {
-      X_Motor_Stop();
-    } else if (receivedString.startsWith("Y_STOP")) {
-      Y_Motor_Stop();
-    }else if (receivedString.startsWith("PUMP_ON")) {
-      Pump_ON();
-    }else if (receivedString.startsWith("PUMP_OFF")) {
-      Pump_OFF();
-    }else if (receivedString.startsWith("HOME_X")) {
-      Home_X();
-    }else if (receivedString.startsWith("HOME_Y")) {
-      Home_Y();
-    }
-  }
-}
-
 int separateValue(String _received) {
   int _value = 0;
   int spaceIndex = _received.indexOf(' ');
@@ -67,6 +36,20 @@ int separateValue(String _received) {
     _value = valueString.toInt();
   }
   return _value;
+}
+
+void X_Motor_Stop() {
+  digitalWrite(X_L_EN,LOW);
+  digitalWrite(X_R_EN,LOW);
+  delayMicroseconds(100);
+  analogWrite(X_Motor , 0);
+}
+
+void Y_Motor_Stop() {
+  digitalWrite(Y_R_EN,LOW);
+  digitalWrite(Y_L_EN,LOW);
+  delayMicroseconds(100);
+  analogWrite(Y_Motor , 0);
 }
 
 void X_Motor_CW(int _runtime) {
@@ -103,29 +86,6 @@ void Y_Motor_CCW(int _runtime) {
   delay(_runtime);
   Y_Motor_Stop();
 }
-
-void X_Motor_Stop() {
-  digitalWrite(X_L_EN,LOW);
-  digitalWrite(X_R_EN,LOW);
-  delayMicroseconds(100);
-  analogWrite(X_Motor , 0);
-}
-
-void Y_Motor_Stop() {
-  digitalWrite(Y_R_EN,LOW);
-  digitalWrite(Y_L_EN,LOW);
-  delayMicroseconds(100);
-  analogWrite(Y_Motor , 0);
-}
-
-void Pump_ON() {
-  digitalWrite(Pump_Relay,LOW);
-}
-
-void Pump_OFF() {
-  digitalWrite(Pump_Relay,HIGH);
-}
-
 void Home_X() {
   while(digitalRead(X_Limit)) {
     digitalWrite(X_R_EN,HIGH);
@@ -144,4 +104,24 @@ void Home_Y() {
     analogWrite(Y_Motor , 130);  
   }
   Y_Motor_Stop();
+}
+
+void CommandMotor(String receivedString) {
+  if (receivedString.startsWith("X_CCW")) {
+    X_Motor_CCW(separateValue(receivedString));
+  } else if (receivedString.startsWith("X_CW")) {
+    X_Motor_CW(separateValue(receivedString));
+  } else if (receivedString.startsWith("Y_CCW")) {
+    Y_Motor_CCW(separateValue(receivedString));
+  } else if (receivedString.startsWith("Y_CW")) {
+    Y_Motor_CW(separateValue(receivedString));
+  } else if (receivedString.startsWith("X_STOP")) {
+    X_Motor_Stop();
+  } else if (receivedString.startsWith("Y_STOP")) {
+    Y_Motor_Stop();
+  }else if (receivedString.startsWith("HOME_X")) {
+    Home_X();
+  }else if (receivedString.startsWith("HOME_Y")) {
+    Home_Y();
+  }
 }
