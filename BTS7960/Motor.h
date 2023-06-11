@@ -9,6 +9,7 @@
 #define X_Limit 4
 #define Y_Limit 5
 
+#define Pump_Relay 6
 void initMotor() {
   pinMode(X_Motor, OUTPUT);
   pinMode(Y_Motor, OUTPUT);
@@ -18,6 +19,7 @@ void initMotor() {
   pinMode(Y_L_EN,OUTPUT);
   pinMode(X_Limit,INPUT_PULLUP);
   pinMode(Y_Limit,INPUT_PULLUP);
+  pinMode(Pump_Relay,INPUT);
 
   //8Khz Frequency on Pin 11 and 12
   TCCR1A = (1 << WGM10) | (1 << COM1A1) | (1 << COM1B1);
@@ -123,5 +125,9 @@ void CommandMotor(String receivedString) {
     Home_X();
   }else if (receivedString.startsWith("HOME_Y")) {
     Home_Y();
+  }else if (receivedString.startsWith("PUMP_ON")) {
+    digitalWrite(Pump_Relay,LOW);
+  }else if (receivedString.startsWith("PUMP_OFF")) {
+    digitalWrite(Pump_Relay,HIGH);
   }
 }
