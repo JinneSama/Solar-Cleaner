@@ -19,9 +19,9 @@ void initMotor() {
   pinMode(Y_L_EN,OUTPUT);
   pinMode(X_Limit,INPUT_PULLUP);
   pinMode(Y_Limit,INPUT_PULLUP);
-  pinMode(Pump_Relay,INPUT);
+  pinMode(Pump_Relay,OUTPUT);
+  digitalWrite(Pump_Relay,HIGH);
 
-  //8Khz Frequency on Pin 11 and 12
   TCCR1A = (1 << WGM10) | (1 << COM1A1) | (1 << COM1B1);
   TCCR1B = (1 << WGM12) | (1 << CS10); 
   OCR1A = 125;

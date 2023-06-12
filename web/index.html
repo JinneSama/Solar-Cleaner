@@ -4,20 +4,170 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="style.css">
+    <title>SolarPi</title>
+    <script>
+        function setHref() {
+            window.location.href = window.location.protocol + "//" + window.location.hostname + ":8000";
+            console.log("XD");
+        }
+
+        function startCleaning(){
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', window.location.protocol + "//" + window.location.hostname + "/cgi-bin/sendWaterData.py", true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                var response = xhr.responseText;
+                window.alert("Cleaning Started!");
+                console.log(response);
+                }
+            };
+            xhr.send();
+        }
+    </script>
+    <style>
+        body{
+            background: #524f4f;
+        }
+
+        .main-container{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .main-container h1,h3{
+            color: #3da5e2;
+        }
+
+        .container-mask{
+            position: absolute;
+            top: 0;
+            background: #524f4f;
+            width: 11rem;
+        }
+
+        .w-outer{
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #524f4f;
+            width: 11rem;
+            height: 11rem;
+            border-radius: 50%;
+            
+            border-style: solid;
+            border-color:#6c74e7;
+            overflow: hidden;
+        }
+
+        .w-outer::after{
+            content: "";
+            display: block;
+            position: absolute;
+            width: 15rem;
+            height: 15rem;
+            background: #524f4f;
+            border-radius: 40%;
+            left: 50%;
+            top: -15rem;
+            transform: translateX(-50%);
+            animation: fill 3.5s ease-in-out;
+        }
+        .w-inner{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #3da5e2;
+            width: 10.5rem;
+            height: 10.5rem;
+            border-radius: 50%;
+        }
+
+        .main-container p{
+            color: #6c74e7;
+            font-size: 1.2em;
+        }
+        
+        .btn{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #6c74e7;
+            width: 15rem;
+            height: 4rem; 
+            border-radius: 5rem;
+            cursor: pointer;
+        }
+
+        .btn:hover{
+            box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+        }
+
+        .btn-Cam{
+            margin-top: 1rem;   
+        }
+
+        .btn p{
+            color: black;
+            font-weight: 600;
+        }
+
+        @keyframes fill{
+            from{
+                top: 0;
+                transform: translateX(-50%) rotate(0deg);
+            }
+            to{
+                top: -15rem;
+                transform: translateX(-50%) rotate(360deg);
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="main-container">
         <h1>Solar Panel Cleaner</h1>
         <h3>Water Level</h3>
         <div class="w-outer">
-            <div class="container-mask">
+        <?php
+            $hostname = $_SERVER['SERVER_NAME'];
+            $url = 'http://' .$hostname. ':7000/distance';
+            $max_water_level = 40;
+
+            $response = file_get_contents($url);
+            if ($response !== false) {
+                $data = json_decode($response, true);
+                if ($data !== null) {
+                    $distance = $data['distance'];
+                    $water_level = ($max_water_level - $distance);
+                    $water_percentage = ($water_level / $max_water_level) * 100;
+                    $height = number_format((float)(9.5 - $water_percentage/11), 2, '.', '');
+                    echo '<div class="container-mask" style="height:' . $height . 'rem;">';
+                } else {
+                    echo "Failed to decode JSON response.";
+                }
+            } else {
+                echo "Failed to make the HTTP request.";
+            }
+        ?>
+
+            
             </div>
             <div class="w-inner">
             </div>
         </div>
-        <p id="waterValue">0%</p>
+        <p id="waterValue"><?php echo $water_percentage . "%"; ?> </p>
+
+        <div class="btn btn-Cam" id="cam" onclick="startCleaning()">
+            <p>Start Cleaning</p>
+        </div>
+        <div class="btn btn-Cam" id="cam" onclick="setHref()">
+            <p>Show Camera</p>
+        </div>
     </div>  
+    
+    
 </body>
 </html>
